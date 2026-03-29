@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעקב מונה דוד — קיסריה</title>
+<meta name="description" content="מעקב צריכת חשמל — דוד קיסריה VEGA 99840527">
+<meta name="theme-color" content="#0a0e14">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="מונה דוד">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e14;--panel:#111720;--border:#1e2d3d;--accent:#00d4ff;--accent2:#ff6b35;--green:#39d353;--yellow:#f0c040;--text:#cdd9e5;--muted:#546678;--danger:#ff4444;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Heebo',sans-serif;min-height:100vh;padding:16px;direction:rtl;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+.wrap{max-width:700px;margin:0 auto;position:relative;z-index:1;}
+h1{font-size:1.5rem;font-weight:900;color:#fff;}
+.subtitle{color:var(--muted);font-size:.8rem;margin-top:4px;font-family:'IBM Plex Mono',monospace;}
+.badge{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--accent);background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.22);padding:4px 10px;border-radius:4px;white-space:nowrap;}
+.header{display:flex;justify-content:space-between;align-items:flex-start;padding:22px 0 18px;border-bottom:1px solid var(--border);margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px;}
+.sec-title{font-size:.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;font-family:'IBM Plex Mono',monospace;}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
+.stat{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;}
+.stat-lbl{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;font-family:'IBM Plex Mono',monospace;}
+.stat-val{font-size:1.2rem;font-weight:700;font-family:'IBM Plex Mono',monospace;}
+.stat-unit{font-size:.6rem;color:var(--muted);margin-top:2px;}
+.c-blue{color:var(--accent);}.c-green{color:var(--green);}.c-orange{color:var(--accent2);}
+
+.cost-banner{background:var(--panel);border:1px solid rgba(255,107,53,.4);border-radius:8px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.cost-banner-label{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--muted);line-height:1.6;}
+.cost-banner-label strong{display:block;font-size:.8rem;color:var(--text);margin-bottom:2px;}
+.cost-banner-amounts{display:flex;gap:20px;align-items:center;flex-wrap:wrap;}
+.cost-item{text-align:center;}
+.cost-item-val{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:1.35rem;color:var(--accent2);display:block;}
+.cost-item-lbl{font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--muted);}
+.cost-divider{width:1px;height:36px;background:var(--border);}
+
+.upload-area{border:2px dashed var(--border);border-radius:10px;padding:20px 16px;text-align:center;margin-bottom:14px;transition:border-color .2s;}
+.upload-area.drag{border-color:var(--accent);background:rgba(0,212,255,.04);}
+.upload-icon{font-size:1.8rem;margin-bottom:8px;}
+.upload-title{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:14px;}
+.upload-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.ubtn{padding:10px 22px;border:none;border-radius:8px;font-family:'Heebo',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;flex:1;min-width:120px;transition:opacity .2s,transform .1s;}
+.ubtn:hover{opacity:.85;}.ubtn:active{transform:scale(.97);}
+.ubtn-cam{background:var(--accent);color:#000;}
+.ubtn-file{background:var(--panel);color:var(--text);border:1px solid var(--border);}
+.ubtn-file:hover{border-color:var(--accent);}
+.drop-hint{font-size:.67rem;color:var(--muted);margin-top:10px;font-family:'IBM Plex Mono',monospace;}
+
+.preview{position:relative;margin-bottom:14px;border-radius:8px;overflow:hidden;border:1px solid var(--border);}
+.preview img{width:100%;max-height:220px;object-fit:cover;display:block;}
+.preview-clear{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.75);border:none;color:#fff;border-radius:4px;padding:4px 9px;cursor:pointer;font-size:.74rem;}
+
+.ai-box{font-family:'IBM Plex Mono',monospace;font-size:.75rem;padding:9px 12px;border-radius:6px;margin-bottom:12px;}
+.ai-loading{background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.25);color:var(--yellow);}
+.ai-done{background:rgba(57,211,83,.08);border:1px solid rgba(57,211,83,.25);color:var(--green);}
+.ai-err{background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.25);color:var(--danger);}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.fgroup{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
+.lbl{font-size:.72rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+.finput{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:.88rem;padding:9px 12px;outline:none;width:100%;transition:border-color .2s;}
+.finput:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,212,255,.1);}
+textarea.finput{resize:vertical;min-height:52px;font-size:.78rem;}
+.btn-save{width:100%;padding:11px;background:var(--accent);color:#000;border:none;border-radius:6px;font-family:'Heebo',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;margin-top:6px;transition:opacity .2s;}
+.btn-save:hover{opacity:.85;}.btn-save:disabled{opacity:.4;cursor:not-allowed;}
+
+.apibox{font-size:.73rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.12);border-radius:6px;padding:10px 12px;margin-bottom:12px;line-height:1.8;}
+.apibox a{color:var(--accent);}
+
+.avg-table{width:100%;border-collapse:collapse;}
+.avg-table th{font-size:.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-family:'IBM Plex Mono',monospace;font-weight:400;padding:6px 10px;border-bottom:1px solid var(--border);text-align:right;}
+.avg-table td{padding:9px 10px;font-family:'IBM Plex Mono',monospace;font-size:.82rem;border-bottom:1px solid rgba(30,45,61,.5);}
+.avg-table tr:last-child td{border-bottom:none;}
+.td-period{color:var(--text);font-weight:600;}.td-kwh{color:var(--green);}.td-cost{color:var(--accent2);}.td-proj{color:var(--yellow);}
+.no-data{color:var(--muted);font-size:.8rem;text-align:center;padding:16px 0;}
+
+.r-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.r-title{font-size:.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;font-family:'IBM Plex Mono',monospace;}
+.btn-clr{font-size:.67rem;color:var(--danger);background:none;border:1px solid rgba(255,68,68,.3);border-radius:4px;padding:3px 9px;cursor:pointer;font-family:'IBM Plex Mono',monospace;}
+.btn-clr:hover{background:rgba(255,68,68,.1);}
+.empty{text-align:center;padding:36px;color:var(--muted);font-size:.82rem;border:1px dashed var(--border);border-radius:8px;}
+.ritem{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:9px;position:relative;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+.ritem:hover{border-color:rgba(0,212,255,.28);}
+.r-main{display:flex;gap:12px;align-items:flex-start;}
+.r-thumb{width:56px;height:56px;object-fit:cover;border-radius:5px;border:1px solid var(--border);flex-shrink:0;cursor:pointer;transition:transform .2s;}
+.r-thumb:hover{transform:scale(1.05);}
+.r-no-thumb{width:56px;height:56px;background:var(--bg);border:1px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.r-body{flex:1;min-width:0;}
+.r-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;}
+.r-dt{font-family:'IBM Plex Mono',monospace;font-size:.71rem;color:var(--muted);}
+.r-kwh{font-family:'IBM Plex Mono',monospace;font-size:1.2rem;font-weight:600;color:#fff;}
+.r-kwh span{font-size:.63rem;color:var(--muted);margin-right:3px;}
+.r-delta{display:inline-flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;font-size:.71rem;color:var(--green);background:rgba(57,211,83,.08);border:1px solid rgba(57,211,83,.18);border-radius:4px;padding:2px 8px;margin-top:4px;}
+.r-delta.first{color:var(--muted);background:rgba(84,102,120,.1);border-color:var(--border);}
+.r-note{font-size:.73rem;color:var(--muted);margin-top:4px;font-style:italic;}
+.pills{display:flex;gap:7px;margin-top:5px;flex-wrap:wrap;}
+.pill{font-family:'IBM Plex Mono',monospace;font-size:.65rem;border-radius:4px;padding:2px 7px;}
+.p-cost{color:var(--accent2);background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.18);}
+.p-ai{color:var(--yellow);background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.18);}
+.btn-del{position:absolute;top:10px;left:12px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;padding:2px 5px;border-radius:4px;}
+.btn-del:hover{color:var(--danger);}
+
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
+.lb img{max-width:100%;max-height:90vh;border-radius:8px;}
+.lb-close{position:absolute;top:16px;right:16px;background:rgba(0,0,0,.7);border:1px solid var(--border);color:var(--text);font-size:1.1rem;border-radius:50%;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:.76rem;padding:10px 20px;border-radius:6px;z-index:200;pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .3s;}
+.toast.show{opacity:1;}
+.t-ok{background:#1a2b1a;border:1px solid var(--green);color:var(--green);}
+.t-err{background:#2b1a1a;border:1px solid var(--danger);color:var(--danger);}
+footer{text-align:center;padding:18px 0;color:var(--muted);font-size:.64rem;font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--border);margin-top:16px;}
+
+@media(max-width:480px){
+  .stats{grid-template-columns:1fr 1fr;}
+  .stats .stat:last-child{grid-column:1/-1;}
+  .row2{grid-template-columns:1fr;}
+  h1{font-size:1.25rem;}
+  .cost-banner{flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div>
+      <h1>⚡ מעקב מונה דוד</h1>
+      <div class="subtitle">VEGA DTS2203-18L · 99840527 · קיסריה</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+      <div class="badge">תעו"ז · חברת חשמל</div>
+      <button onclick="syncAllToSheet().then(()=>toast('סונכרן ✓')).catch(()=>toast('שגיאת סנכרון',true))" style="font-size:.65rem;font-family:'IBM Plex Mono',monospace;background:rgba(57,211,83,.1);border:1px solid rgba(57,211,83,.3);color:var(--green);border-radius:4px;padding:4px 10px;cursor:pointer;">↑ סנכרן Sheets</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats" id="statsBar">
+    <div class="stat"><div class="stat-lbl">קריאות</div><div class="stat-val c-blue" id="sCount">0</div><div class="stat-unit">רשומות</div></div>
+    <div class="stat"><div class="stat-lbl">סה"כ צריכה</div><div class="stat-val c-green" id="sTotal">—</div><div class="stat-unit">kWh</div></div>
+    <div class="stat"><div class="stat-lbl">ימי מעקב</div><div class="stat-val c-blue" id="sDays">—</div><div class="stat-unit">ימים</div></div>
+  </div>
+
+  <!-- Cost banner -->
+  <div class="cost-banner" id="costBanner" style="display:none">
+    <div class="cost-banner-label">
+      <strong>💰 סך עלות מצטברת</strong>
+      <span id="costRange"></span>
+    </div>
+    <div class="cost-banner-amounts">
+      <div class="cost-item"><span class="cost-item-val" id="costTotal">—</span><span class="cost-item-lbl">עלות כוללת</span></div>
+      <div class="cost-divider"></div>
+      <div class="cost-item"><span class="cost-item-val" id="costKwh">—</span><span class="cost-item-lbl">kWh כולל</span></div>
+      <div class="cost-divider"></div>
+      <div class="cost-item"><span class="cost-item-val" id="costMonthly">—</span><span class="cost-item-lbl">חודשי ממוצע</span></div>
+    </div>
+  </div>
+
+  <!-- Averages -->
+  <div class="card">
+    <div class="sec-title">📊 ממוצעי צריכה</div>
+    <div id="avgContainer"><div class="no-data">יש צורך בלפחות 2 קריאות</div></div>
+  </div>
+
+  <!-- Add form -->
+  <div class="card">
+    <div class="sec-title">+ הוסף קריאה</div>
+
+    <div class="apibox">
+      🤖 <strong>קריאה אוטומטית:</strong> הכנס
+      <a href="https://console.anthropic.com/settings/keys" target="_blank">Anthropic API Key</a>
+      ואני אקרא את המונה מהתמונה.<br>
+      <input class="finput" type="password" id="apiKeyInput" placeholder="sk-ant-api..." style="margin-top:8px;font-size:.78rem" oninput="saveKey(this.value)">
+    </div>
+
+    <div class="upload-area" id="uploadArea"
+      ondragover="event.preventDefault();this.classList.add('drag')"
+      ondragleave="this.classList.remove('drag')"
+      ondrop="handleDrop(event)">
+      <div class="upload-icon">📷</div>
+      <div class="upload-title">צרף תמונה של המונה</div>
+      <div class="upload-btns">
+        <label class="ubtn ubtn-cam">
+          📸 צלם עכשיו
+          <input type="file" accept="image/*" capture="environment" onchange="handleFile(event)" style="position:absolute;width:0;height:0;opacity:0">
+        </label>
+        <label class="ubtn ubtn-file">
+          🖼 גלריה / קובץ
+          <input type="file" accept="image/*" onchange="handleFile(event)" style="position:absolute;width:0;height:0;opacity:0">
+        </label>
+      </div>
+      <div class="drop-hint">או גרור תמונה לכאן</div>
+    </div>
+
+    <div class="preview" id="previewBox" style="display:none">
+      <img id="previewImg" src="" alt="preview">
+      <button class="preview-clear" onclick="clearImg()">✕ הסר</button>
+    </div>
+
+    <div class="ai-box" id="aiBox" style="display:none"></div>
+
+    <div class="row2">
+      <div class="fgroup"><label class="lbl">תאריך</label><input class="finput" type="date" id="iDate"></div>
+      <div class="fgroup"><label class="lbl">שעה</label><input class="finput" type="time" id="iTime"></div>
+    </div>
+    <div class="fgroup"><label class="lbl">קריאת מונה (kWh)</label><input class="finput" type="number" id="iKwh" placeholder="0.0" step="0.1" min="0"></div>
+    <div class="fgroup" style="margin-top:10px"><label class="lbl">הערה (אופציונלי)</label><textarea class="finput" id="iNote" placeholder="למשל: אחרי מקלחת, יום חם..."></textarea></div>
+    <button class="btn-save" id="btnSave" onclick="addReading()">שמור קריאה</button>
+  </div>
+
+  <div class="r-header">
+    <div class="r-title">היסטוריית קריאות</div>
+    <button class="btn-clr" onclick="clearAll()">מחק הכל</button>
+  </div>
+  <div id="list"></div>
+
+  <footer>meter-tracker · AI + localStorage · VEGA 99840527 · 2026</footer>
+</div>
+
+<!-- Lightbox -->
+<div class="lb" id="lb" style="display:none" onclick="closeLb()">
+  <button class="lb-close">✕</button>
+  <img id="lbImg" src="" alt="" onclick="event.stopPropagation()">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY = 'meter_vega_v4';
+const AKEY = 'meter_ak';
+const RATE = 0.60;
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyGV_NDRqcUEtLldMaKyry2SZgEQltjBUifn543lYvdiw6W9efPvBoN_AcJ6FLVvKU9/exec';
+
+let currentThumb = null;
+
+// ── STORAGE ──────────────────────────────────────────
+function load() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } }
+function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
+function getKey() { return document.getElementById('apiKeyInput').value || localStorage.getItem(AKEY) || ''; }
+function saveKey(v) { if (v) localStorage.setItem(AKEY, v); }
+
+// ── EXIF ─────────────────────────────────────────────
+function readExif(file) {
+  return new Promise(res => {
+    const r = new FileReader();
+    r.onload = e => {
+      try {
+        const buf = new Uint8Array(e.target.result);
+        for (let i = 0; i < Math.min(buf.length - 20, 65536); i++) {
+          if (buf[i] === 0x32 && buf[i+1] === 0x30) {
+            const s = String.fromCharCode(...buf.slice(i, i+19));
+            if (/^20\d{2}:\d{2}:\d{2} \d{2}:\d{2}:\d{2}$/.test(s)) {
+              const [dp, tp] = s.split(' ');
+              const [y,m,d] = dp.split(':');
+              res({ date:`${y}-${m}-${d}`, time:tp.slice(0,5) });
+              return;
+            }
+          }
+        }
+        res(null);
+      } catch { res(null); }
+    };
+    r.readAsArrayBuffer(file);
+  });
+}
+
+// ── AI ───────────────────────────────────────────────
+async function aiRead(b64, mime, hasExif) {
+  const apiKey = getKey();
+  if (!apiKey) return null;
+  const prompt = hasExif
+    ? `Electricity meter photo. Read the kWh value on the LCD.\nReturn ONLY JSON: {"kwh":5.5}\nIf unclear: {"kwh":null}. No other text.`
+    : `Electricity meter photo. Read kWh value and if possible photo date/time.\nReturn ONLY JSON: {"kwh":5.5,"date":"2026-03-27","time":"14:27"}\nOmit date/time if unknown. No other text.`;
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-6', max_tokens:150,
+      messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:mime,data:b64}},
+        {type:'text',text:prompt}
+      ]}]
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  const text = data.content.find(c=>c.type==='text')?.text||'';
+  return JSON.parse(text.replace(/```json|```/g,'').trim());
+}
+
+// ── FILE HANDLING ─────────────────────────────────────
+async function handleFile(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  await processFile(file);
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadArea').classList.remove('drag');
+  const file = e.dataTransfer.files?.[0];
+  if (file) processFile(file);
+}
+
+async function processFile(file) {
+  const dataUrl = await new Promise(res => {
+    const r = new FileReader(); r.onload = e => res(e.target.result); r.readAsDataURL(file);
+  });
+  currentThumb = dataUrl;
+  document.getElementById('previewImg').src = dataUrl;
+  document.getElementById('previewBox').style.display = 'block';
+  document.getElementById('uploadArea').style.display = 'none';
+  setAi('', '');
+
+  // EXIF
+  const exif = await readExif(file);
+  if (exif) {
+    document.getElementById('iDate').value = exif.date;
+    document.getElementById('iTime').value = exif.time;
+    setAi('done', `⏱ זמן מ-EXIF: ${fmtDate(exif.date)} ${exif.time}`);
+  }
+
+  // AI
+  const apiKey = getKey();
+  if (apiKey) {
+    setAi('loading', '🤖 Claude קורא את המונה...');
+    document.getElementById('btnSave').disabled = true;
+    try {
+      const b64 = dataUrl.split(',')[1];
+      const result = await aiRead(b64, file.type||'image/jpeg', !!exif);
+      const msgs = [];
+      if (result?.kwh != null) { document.getElementById('iKwh').value = result.kwh; msgs.push(`⚡ ${result.kwh} kWh`); }
+      if (!exif && result?.date) { document.getElementById('iDate').value = result.date; msgs.push(`📅 ${fmtDate(result.date)}`); }
+      if (!exif && result?.time) { document.getElementById('iTime').value = result.time; msgs.push(`⏰ ${result.time}`); }
+      setAi('done', '✓ ' + (msgs.length ? msgs.join(' · ') : 'לא ניתן לקרוא'));
+    } catch(err) {
+      setAi('err', '⚠ ' + err.message);
+    } finally {
+      document.getElementById('btnSave').disabled = false;
+    }
+  }
+}
+
+function clearImg() {
+  currentThumb = null;
+  document.getElementById('previewBox').style.display = 'none';
+  document.getElementById('uploadArea').style.display = 'block';
+  document.getElementById('aiBox').style.display = 'none';
+}
+
+function setAi(type, msg) {
+  const el = document.getElementById('aiBox');
+  if (!msg) { el.style.display='none'; return; }
+  el.style.display = 'block';
+  el.className = 'ai-box ai-' + type;
+  el.textContent = msg;
+}
+
+// ── SYNC TO SHEETS ───────────────────────────────────
+async function syncToSheet(r, prev) {
+  if (!SHEETS_URL) return;
+  let diff='', hrs='', kw='';
+  if (prev) {
+    diff = (r.kwh - prev.kwh).toFixed(1);
+    hrs  = ((new Date(r.date+'T'+r.time) - new Date(prev.date+'T'+prev.time)) / 3600000).toFixed(2);
+    kw   = hrs > 0 ? (diff / hrs).toFixed(3) : '';
+  }
+  try {
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ date:r.date, time:r.time, kwh:r.kwh, diff, hrs, kw, note:r.note||'', aiRead:r.aiRead||false })
+    });
+  } catch(e) { console.warn('Sheets sync failed:', e); }
+}
+
+async function syncAllToSheet() {
+  if (!SHEETS_URL) return;
+  const sorted = load().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  for (let i = 0; i < sorted.length; i++) {
+    await syncToSheet(sorted[i], sorted[i-1] || null);
+  }
+}
+
+// ── ADD READING ───────────────────────────────────────
+function addReading() {
+  const date = document.getElementById('iDate').value;
+  const time = document.getElementById('iTime').value;
+  const kwh  = parseFloat(document.getElementById('iKwh').value);
+  const note = document.getElementById('iNote').value.trim();
+  if (!date || !time || isNaN(kwh)) { toast('נא למלא תאריך, שעה וקריאה', true); return; }
+
+  const aiBox = document.getElementById('aiBox');
+  const readings = load();
+  readings.push({ date, time, kwh, note, id:Date.now(), aiRead: aiBox.classList.contains('ai-done') && aiBox.textContent.includes('⚡'), thumb: currentThumb });
+  readings.sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
+  save(readings);
+
+  document.getElementById('iKwh').value = '';
+  document.getElementById('iNote').value = '';
+  clearImg();
+  render();
+
+  // Sync to Google Sheets
+  const sorted2 = load().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  const idx2 = sorted2.findIndex(x => x.id === readings[readings.length-1].id);
+  syncToSheet(sorted2[idx2], sorted2[idx2-1] || null).then(() => toast('נשמר + Sheets ✓')).catch(() => toast('נשמר ✓'));
+}
+
+function deleteReading(id) {
+  save(load().filter(r => r.id !== id));
+  render();
+}
+
+function clearAll() {
+  if (confirm('למחוק את כל הקריאות?')) { save([]); render(); }
+}
+
+// ── AVERAGES ──────────────────────────────────────────
+function computeAvg(sorted) {
+  if (sorted.length < 2) return null;
+  const totalKwh = sorted[sorted.length-1].kwh - sorted[0].kwh;
+  const totalDays = (new Date(sorted[sorted.length-1].date+'T'+sorted[sorted.length-1].time) - new Date(sorted[0].date+'T'+sorted[0].time)) / 86400000;
+  if (totalDays <= 0 || totalKwh <= 0) return null;
+  const d = totalKwh / totalDays;
+  return {
+    daily:   { kwh:d.toFixed(2),        cost:(d*RATE).toFixed(2),        annKwh:(d*365).toFixed(0),  annCost:(d*365*RATE).toFixed(0) },
+    weekly:  { kwh:(d*7).toFixed(1),    cost:(d*7*RATE).toFixed(1)   },
+    monthly: { kwh:(d*30.4).toFixed(0), cost:(d*30.4*RATE).toFixed(0) },
+  };
+}
+
+// ── RENDER ────────────────────────────────────────────
+function fmtDate(s) { const [y,m,d]=s.split('-'); return `${d}/${m}/${y}`; }
+
+function render() {
+  const readings = load();
+  const sorted = [...readings].sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+
+  // Stats
+  document.getElementById('sCount').textContent = sorted.length;
+  if (sorted.length >= 2) {
+    const totalKwh = sorted[sorted.length-1].kwh - sorted[0].kwh;
+    const days = ((new Date(sorted[sorted.length-1].date+'T'+sorted[sorted.length-1].time) - new Date(sorted[0].date+'T'+sorted[0].time)) / 86400000).toFixed(1);
+    document.getElementById('sTotal').textContent = totalKwh.toFixed(1);
+    document.getElementById('sDays').textContent = days;
+
+    // Cost banner
+    const avgs = computeAvg(sorted);
+    document.getElementById('costBanner').style.display = 'flex';
+    document.getElementById('costRange').textContent = `${fmtDate(sorted[0].date)} — ${fmtDate(sorted[sorted.length-1].date)} · ${days} ימים`;
+    document.getElementById('costTotal').textContent = `₪${(totalKwh * RATE).toFixed(2)}`;
+    document.getElementById('costKwh').textContent = totalKwh.toFixed(1);
+    document.getElementById('costMonthly').textContent = avgs ? `₪${avgs.monthly.cost}` : '—';
+  } else {
+    document.getElementById('sTotal').textContent = '—';
+    document.getElementById('sDays').textContent = '—';
+    document.getElementById('costBanner').style.display = 'none';
+  }
+
+  // Averages
+  const avgs = computeAvg(sorted);
+  const avgEl = document.getElementById('avgContainer');
+  if (!avgs) {
+    avgEl.innerHTML = '<div class="no-data">יש צורך בלפחות 2 קריאות</div>';
+  } else {
+    avgEl.innerHTML = `
+      <table class="avg-table">
+        <thead><tr><th>תקופה</th><th>צריכה (kWh)</th><th>עלות (₪)</th><th>היקף שנתי</th></tr></thead>
+        <tbody>
+          <tr><td class="td-period">📅 יומי</td><td class="td-kwh">${avgs.daily.kwh}</td><td class="td-cost">₪${avgs.daily.cost}</td><td class="td-proj">${avgs.daily.annKwh} kWh · ₪${avgs.daily.annCost}/שנה</td></tr>
+          <tr><td class="td-period">📆 שבועי</td><td class="td-kwh">${avgs.weekly.kwh}</td><td class="td-cost">₪${avgs.weekly.cost}</td><td class="td-proj">—</td></tr>
+          <tr><td class="td-period">🗓️ חודשי</td><td class="td-kwh">${avgs.monthly.kwh}</td><td class="td-cost">₪${avgs.monthly.cost}</td><td class="td-proj">—</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:9px;font-size:.63rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;">* תעריף ממוצע ₪0.60/kWh (תעו"ז מעורב) · ${sorted.length} קריאות</div>`;
+  }
+
+  // List
+  const listEl = document.getElementById('list');
+  if (sorted.length === 0) {
+    listEl.innerHTML = '<div class="empty">אין קריאות עדיין<br>צרף תמונה של המונה למעלה</div>';
+    return;
+  }
+  listEl.innerHTML = [...sorted].reverse().map(r => {
+    const idx = sorted.findIndex(x => x.id === r.id);
+    const prev = sorted[idx-1];
+    let deltaHTML = '';
+    if (!prev) {
+      deltaHTML = '<div class="r-delta first">נקודת פתיחה</div>';
+    } else {
+      const diff = (r.kwh - prev.kwh).toFixed(1);
+      const hrs  = ((new Date(r.date+'T'+r.time) - new Date(prev.date+'T'+prev.time)) / 3600000).toFixed(1);
+      const kw   = hrs > 0 ? (diff/hrs).toFixed(2) : '—';
+      deltaHTML = `
+        <div class="r-delta">▲ ${diff} kWh · ${hrs} שע' · ${kw} kW ממוצע</div>
+        <div class="pills">
+          <span class="pill p-cost">~₪${(diff*RATE).toFixed(2)}</span>
+          ${r.aiRead ? '<span class="pill p-ai">🤖 AI</span>' : ''}
+        </div>`;
+    }
+    const thumbHTML = r.thumb
+      ? `<img class="r-thumb" src="${r.thumb}" alt="meter" onclick="openLb('${r.thumb}')">`
+      : `<div class="r-no-thumb">📷</div>`;
+    return `
+      <div class="ritem">
+        <button class="btn-del" onclick="deleteReading(${r.id})">✕</button>
+        <div class="r-main">
+          ${thumbHTML}
+          <div class="r-body">
+            <div class="r-top">
+              <div class="r-dt">${fmtDate(r.date)} · ${r.time}</div>
+              <div class="r-kwh"><span>kWh</span>${r.kwh.toFixed(1)}</div>
+            </div>
+            ${deltaHTML}
+            ${r.note ? `<div class="r-note">💬 ${r.note}</div>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── LIGHTBOX ──────────────────────────────────────────
+function openLb(src) { document.getElementById('lbImg').src=src; document.getElementById('lb').style.display='flex'; }
+function closeLb() { document.getElementById('lb').style.display='none'; }
+
+// ── TOAST ─────────────────────────────────────────────
+function toast(msg, err=false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + (err ? 't-err' : 't-ok');
+  setTimeout(() => el.className = 'toast', 3000);
+}
+
+// ── INIT ──────────────────────────────────────────────
+function init() {
+  // Defaults
+  const now = new Date(), p = n => String(n).padStart(2,'0');
+  document.getElementById('iDate').value = `${now.getFullYear()}-${p(now.getMonth()+1)}-${p(now.getDate())}`;
+  document.getElementById('iTime').value = `${p(now.getHours())}:${p(now.getMinutes())}`;
+  const k = localStorage.getItem(AKEY);
+  if (k) document.getElementById('apiKeyInput').value = k;
+
+  // Seed data if empty
+  if (load().length === 0) {
+    save([
+      {date:'2026-03-27',time:'11:15',kwh:0.1,note:'קריאה ראשונה — מונה חדש הותקן',id:1743069300000,aiRead:false,thumb:null},
+      {date:'2026-03-27',time:'14:27',kwh:5.5,note:'',id:1743081420000,aiRead:false,thumb:null}
+    ]);
+  }
+
+  render();
+
+  // PWA service worker
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+window.addEventListener('load', init);
+</script>
+</body>
+</html>

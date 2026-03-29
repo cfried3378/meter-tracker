@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" fill="#0a0e14" rx="32"/>
+  <rect x="36" y="48" width="120" height="76" rx="8" fill="#111720" stroke="#1e2d3d" stroke-width="2"/>
+  <rect x="48" y="60" width="96" height="40" rx="4" fill="#0a1520"/>
+  <text x="96" y="90" font-family="monospace" font-size="24" fill="#00d4ff" text-anchor="middle" font-weight="bold">kWh</text>
+  <circle cx="60" cy="112" r="4" fill="#ff4444"/>
+  <circle cx="76" cy="112" r="4" fill="#39d353"/>
+  <circle cx="92" cy="112" r="4" fill="#00d4ff"/>
+  <text x="96" y="152" font-family="sans-serif" font-size="13" fill="#39d353" text-anchor="middle">⚡ מונה דוד</text>
+</svg>

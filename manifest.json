@@ -1,0 +1,15 @@
+{
+  "name": "מעקב מונה דוד — קיסריה",
+  "short_name": "מונה דוד",
+  "description": "מעקב צריכת חשמל — VEGA 99840527",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0e14",
+  "theme_color": "#0a0e14",
+  "orientation": "portrait",
+  "lang": "he",
+  "dir": "rtl",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
