@@ -234,6 +234,7 @@ footer{text-align:center;padding:18px 0;color:var(--muted);font-size:.64rem;font
 <script>
 const KEY = 'meter_vega_v4';
 const AKEY = 'meter_ak';
+const HARDCODED_KEY = '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';
 const RATE = 0.60;
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyGV_NDRqcUEtLldMaKyry2SZgEQltjBUifn543lYvdiw6W9efPvBoN_AcJ6FLVvKU9/exec';
 
@@ -242,7 +243,7 @@ let currentThumb = null;
 // ── STORAGE ──────────────────────────────────────────
 function load() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } }
 function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
-function getKey() { return document.getElementById('apiKeyInput').value || localStorage.getItem(AKEY) || ''; }
+function getKey() { return document.getElementById('apiKeyInput').value || localStorage.getItem(AKEY) || HARDCODED_KEY || ''; }
 function saveKey(v) { if (v) localStorage.setItem(AKEY, v); }
 
 // ── EXIF ─────────────────────────────────────────────
