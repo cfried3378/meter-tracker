@@ -172,11 +172,9 @@ footer{text-align:center;padding:18px 0;color:var(--muted);font-size:.64rem;font
   <div class="card">
     <div class="sec-title">+ הוסף קריאה</div>
 
-    <div class="apibox">
-      🤖 <strong>קריאה אוטומטית:</strong> הכנס
-      <a href="https://console.anthropic.com/settings/keys" target="_blank">Anthropic API Key</a>
-      ואני אקרא את המונה מהתמונה.<br>
-      <input class="finput" type="password" id="apiKeyInput" placeholder="sk-ant-api..." style="margin-top:8px;font-size:.78rem" oninput="saveKey(this.value)">
+    <div class="apibox" style="display:none">
+      ✅ <strong>קריאה אוטומטית פעילה</strong> — צרף תמונה ואני אקרא את המונה אוטומטית.
+      <input type="hidden" id="apiKeyInput" value="">
     </div>
 
     <div class="upload-area" id="uploadArea"
@@ -231,10 +229,12 @@ footer{text-align:center;padding:18px 0;color:var(--muted);font-size:.64rem;font
 
 <div class="toast" id="toast"></div>
 
+<script src="config.js"></script>
 <script>
 const KEY = 'meter_vega_v4';
 const AKEY = 'meter_ak';
-const HARDCODED_KEY = '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';
+const HARDCODED_KEY = window.METER_API_KEY || '';
+const HARDCODED_KEY = window.METER_API_KEY || '';
 const RATE = 0.60;
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyGV_NDRqcUEtLldMaKyry2SZgEQltjBUifn543lYvdiw6W9efPvBoN_AcJ6FLVvKU9/exec';
 
@@ -243,8 +243,13 @@ let currentThumb = null;
 // ── STORAGE ──────────────────────────────────────────
 function load() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } }
 function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
-function getKey() { return document.getElementById('apiKeyInput').value || localStorage.getItem(AKEY) || HARDCODED_KEY || ''; }
-function saveKey(v) { if (v) localStorage.setItem(AKEY, v); }
+function getKey() { const el = document.getElementById('apiKeyInput'); const v = el ? el.value : ''; return v || localStorage.getItem(AKEY) || sessionStorage.getItem(AKEY) || HARDCODED_KEY || ''; }
+function saveKey(v) {
+  if (v) {
+    try { localStorage.setItem(AKEY, v); } catch(e) {}
+    try { sessionStorage.setItem(AKEY, v); } catch(e) {}
+  }
+}
 
 // ── EXIF ─────────────────────────────────────────────
 function readExif(file) {
@@ -545,7 +550,7 @@ function init() {
   const now = new Date(), p = n => String(n).padStart(2,'0');
   document.getElementById('iDate').value = `${now.getFullYear()}-${p(now.getMonth()+1)}-${p(now.getDate())}`;
   document.getElementById('iTime').value = `${p(now.getHours())}:${p(now.getMinutes())}`;
-  const k = localStorage.getItem(AKEY);
+  const k = localStorage.getItem(AKEY) || sessionStorage.getItem(AKEY);
   if (k) document.getElementById('apiKeyInput').value = k;
 
   // Seed data if empty
