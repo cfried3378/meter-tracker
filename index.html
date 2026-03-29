@@ -279,7 +279,7 @@ async function aiRead(b64, mime, hasExif) {
     : `Electricity meter photo. Read kWh value and if possible photo date/time.\nReturn ONLY JSON: {"kwh":5.5,"date":"2026-03-27","time":"14:27"}\nOmit date/time if unknown. No other text.`;
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
+    headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
     body:JSON.stringify({
       model:'claude-sonnet-4-6', max_tokens:150,
       messages:[{role:'user',content:[
