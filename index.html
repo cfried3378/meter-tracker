@@ -172,10 +172,7 @@ footer{text-align:center;padding:18px 0;color:var(--muted);font-size:.64rem;font
   <div class="card">
     <div class="sec-title">+ הוסף קריאה</div>
 
-    <div class="apibox" style="display:none">
-      ✅ <strong>קריאה אוטומטית פעילה</strong> — צרף תמונה ואני אקרא את המונה אוטומטית.
-      <input type="hidden" id="apiKeyInput" value="">
-    </div>
+    <div class="apibox">📷 <strong>צרף תמונה</strong> — התאריך והשעה יזוהו אוטומטית. קריאת המונה — הזן ידנית.</div>
 
     <div class="upload-area" id="uploadArea"
       ondragover="event.preventDefault();this.classList.add('drag')"
@@ -331,24 +328,10 @@ async function processFile(file) {
     setAi('done', `⏱ זמן מ-EXIF: ${fmtDate(exif.date)} ${exif.time}`);
   }
 
-  // AI
-  const apiKey = getKey();
-  if (apiKey) {
-    setAi('loading', '🤖 Claude קורא את המונה...');
-    document.getElementById('btnSave').disabled = true;
-    try {
-      const b64 = dataUrl.split(',')[1];
-      const result = await aiRead(b64, file.type||'image/jpeg', !!exif);
-      const msgs = [];
-      if (result?.kwh != null) { document.getElementById('iKwh').value = result.kwh; msgs.push(`⚡ ${result.kwh} kWh`); }
-      if (!exif && result?.date) { document.getElementById('iDate').value = result.date; msgs.push(`📅 ${fmtDate(result.date)}`); }
-      if (!exif && result?.time) { document.getElementById('iTime').value = result.time; msgs.push(`⏰ ${result.time}`); }
-      setAi('done', '✓ ' + (msgs.length ? msgs.join(' · ') : 'לא ניתן לקרוא'));
-    } catch(err) {
-      setAi('err', '⚠ ' + err.message);
-    } finally {
-      document.getElementById('btnSave').disabled = false;
-    }
+  if (exif) {
+    setAi('done', `📅 ${fmtDate(exif.date)} · ⏰ ${exif.time} — זוהה מהתמונה`);
+  } else {
+    setAi('done', '📅 זמן לא זוהה — מלא ידנית');
   }
 }
 
